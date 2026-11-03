@@ -17,4 +17,24 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => {
+    // If the server returned HTML (e.g. Vercel SPA rewrite fallback when backend is not yet attached)
+    const contentType = String(response.headers?.['content-type'] || '');
+    if (
+      typeof response.data === 'string' &&
+      (contentType.includes('text/html') ||
+        response.data.trim().toLowerCase().startsWith('<!doctype') ||
+        response.data.trim().toLowerCase().startsWith('<html'))
+    ) {
+      console.warn('[API Warning]: Backend endpoint returned HTML (SPA fallback). Backend might not be configured.');
+      return { ...response, data: null };
+    }
+    return response;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export default api;

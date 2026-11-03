@@ -21,7 +21,7 @@ export const AuthorFilter: React.FC<AuthorFilterProps> = ({
         className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-rose-900 focus:outline-none"
       >
         <option value="">සියලු කතුවරුන් (All Authors)</option>
-        {authors.map((a) => (
+        {(Array.isArray(authors) ? authors : []).map((a) => (
           <option key={a.id} value={a.id}>
             {a.name}
           </option>

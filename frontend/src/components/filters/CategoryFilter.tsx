@@ -21,7 +21,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
         className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-rose-900 focus:outline-none"
       >
         <option value="">සියලු ප්‍රවර්ග (All Categories)</option>
-        {categories.map((c) => (
+        {(Array.isArray(categories) ? categories : []).map((c) => (
           <option key={c.id} value={c.id}>
             {c.name} {c._count?.articles ? `(${c._count.articles})` : ''}
           </option>

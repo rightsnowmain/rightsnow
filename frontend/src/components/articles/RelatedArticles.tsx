@@ -7,7 +7,7 @@ interface RelatedArticlesProps {
 }
 
 export const RelatedArticles: React.FC<RelatedArticlesProps> = ({ articles }) => {
-  if (!articles || articles.length === 0) return null;
+  if (!Array.isArray(articles) || articles.length === 0) return null;
 
   const fallbackImage = 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600&auto=format&fit=crop&q=80';
 

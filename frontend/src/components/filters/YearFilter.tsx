@@ -20,7 +20,7 @@ export const YearFilter: React.FC<YearFilterProps> = ({
         className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-rose-900 focus:outline-none"
       >
         <option value="">සියලු වසර (All Years)</option>
-        {years.map((y) => (
+        {(Array.isArray(years) ? years : []).map((y) => (
           <option key={y} value={y}>
             {y} වසර
           </option>

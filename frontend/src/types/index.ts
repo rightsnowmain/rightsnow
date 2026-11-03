@@ -23,7 +23,7 @@ export interface Newspaper {
   slug: string;
   description?: string;
   logoUrl?: string;
-  publisherId: string;
+  publisherId?: string;
   publisher?: Publisher;
   _count?: { articles: number };
 }
@@ -50,7 +50,7 @@ export interface Article {
   title: string;
   excerpt?: string;
   body: string;
-  status: 'DRAFT' | 'IN_REVIEW' | 'APPROVED' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
+  status?: 'DRAFT' | 'IN_REVIEW' | 'APPROVED' | 'SCHEDULED' | 'PUBLISHED' | 'ARCHIVED';
   publishedAt?: string;
   originalPublishedAt?: string;
   createdAt?: string;
@@ -58,7 +58,7 @@ export interface Article {
   featuredImage?: string;
   sourceUrl?: string;
   viewCount: number;
-  authorId: string;
+  authorId?: string;
   author: Author;
   newspaperId?: string;
   newspaper?: Newspaper;

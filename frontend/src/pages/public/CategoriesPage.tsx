@@ -13,9 +13,10 @@ export const CategoriesPage: React.FC = () => {
     const fetch = async () => {
       try {
         const data = await PublishersService.getCategories();
-        setCategories(data);
+        setCategories(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error(err);
+        setCategories([]);
       } finally {
         setLoading(false);
       }
@@ -24,6 +25,8 @@ export const CategoriesPage: React.FC = () => {
   }, []);
 
   if (loading) return <LoadingSpinner />;
+
+  const safeCategories = Array.isArray(categories) ? categories : [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -37,7 +40,7 @@ export const CategoriesPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {categories.map((cat) => (
+        {safeCategories.map((cat) => (
           <Link
             key={cat.id}
             to={`/archive?categoryId=${cat.id}`}

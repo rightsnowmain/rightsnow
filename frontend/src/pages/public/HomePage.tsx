@@ -23,10 +23,12 @@ export const HomePage: React.FC = () => {
           ArticlesService.getArticles({ limit: 7, sort: 'newest' }),
           PublishersService.getNewspapers(),
         ]);
-        setArticles(artsRes.data || []);
-        setNewspapers(newsRes || []);
+        setArticles(Array.isArray(artsRes?.data) ? artsRes.data : []);
+        setNewspapers(Array.isArray(newsRes) ? newsRes : []);
       } catch (err) {
         console.error('Error fetching homepage data:', err);
+        setArticles([]);
+        setNewspapers([]);
       } finally {
         setLoading(false);
       }
@@ -45,9 +47,11 @@ export const HomePage: React.FC = () => {
     return <LoadingSpinner message="නවතම ප්‍රවෘත්ති සහ ලේඛනාගාර ලිපි පූරණය වෙමින් පවතී..." />;
   }
 
-  const featuredArticle = articles[0];
-  const secondaryArticles = articles.slice(1, 4);
-  const remainingArticles = articles.slice(4);
+  const safeArticles = Array.isArray(articles) ? articles : [];
+  const featuredArticle = safeArticles.length > 0 ? safeArticles[0] : null;
+  const secondaryArticles = safeArticles.slice(1, 4);
+  const remainingArticles = safeArticles.slice(4);
+  const safeNewspapers = Array.isArray(newspapers) ? newspapers : [];
 
   const homeJsonLd = {
     '@context': 'https://schema.org',
@@ -157,7 +161,7 @@ export const HomePage: React.FC = () => {
       )}
 
       {/* Newspaper Publications Banner */}
-      {newspapers.length > 0 && (
+      {safeNewspapers.length > 0 && (
         <section className="bg-slate-900 rounded-2xl p-6 sm:p-8 text-white">
           <div className="flex items-center gap-3 mb-6">
             <NewspaperIcon className="w-6 h-6 text-rose-400" />
@@ -165,7 +169,7 @@ export const HomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {newspapers.map((item) => (
+            {safeNewspapers.map((item) => (
               <div
                 key={item.id}
                 className="bg-slate-800/80 border border-slate-700 rounded-xl p-5 hover:border-slate-600 transition flex flex-col justify-between"

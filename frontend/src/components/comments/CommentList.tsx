@@ -78,7 +78,7 @@ export const CommentList: React.FC<CommentListProps> = ({ comments, articleId, o
 
   return (
     <div className="space-y-6">
-      {comments.map((c) => (
+      {(Array.isArray(comments) ? comments : []).map((c) => (
         <div key={c.id} className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
           {/* Main Comment Header */}
           <div className="flex items-center justify-between mb-2">
@@ -170,7 +170,7 @@ export const CommentList: React.FC<CommentListProps> = ({ comments, articleId, o
           )}
 
           {/* Nested Replies List */}
-          {c.replies && c.replies.length > 0 && (
+          {Array.isArray(c.replies) && c.replies.length > 0 && (
             <div className="mt-4 pl-8 border-l-2 border-slate-200 space-y-3">
               {c.replies.map((reply) => (
                 <div key={reply.id} className="bg-slate-50/80 p-3.5 rounded-lg border border-slate-200/80">

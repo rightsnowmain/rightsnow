@@ -8,7 +8,7 @@ interface ArticleListProps {
 }
 
 export const ArticleList: React.FC<ArticleListProps> = ({ articles, columns = 3 }) => {
-  if (!articles || articles.length === 0) {
+  if (!Array.isArray(articles) || articles.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-slate-200 p-12 text-center my-8">
         <p className="text-slate-500 font-medium">කිසිදු ලිපියක් හමු නොවීය.</p>

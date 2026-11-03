@@ -13,9 +13,10 @@ export const NewspapersPage: React.FC = () => {
     const fetch = async () => {
       try {
         const data = await PublishersService.getNewspapers();
-        setNewspapers(data);
+        setNewspapers(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error(err);
+        setNewspapers([]);
       } finally {
         setLoading(false);
       }
@@ -24,6 +25,8 @@ export const NewspapersPage: React.FC = () => {
   }, []);
 
   if (loading) return <LoadingSpinner />;
+
+  const safeNewspapers = Array.isArray(newspapers) ? newspapers : [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -37,7 +40,7 @@ export const NewspapersPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {newspapers.map((item) => (
+        {safeNewspapers.map((item) => (
           <div
             key={item.id}
             className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between"

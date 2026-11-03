@@ -215,9 +215,9 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({ article }) => {
     xlarge: 'text-xl md:text-2xl leading-loose',
   }[fontSize];
 
-  const uniqueCategories = Array.from(
-    new Map(article.categories?.map((cat) => [cat.name.trim(), cat]) || []).values()
-  );
+  const uniqueCategories = Array.isArray(article.categories)
+    ? Array.from(new Map(article.categories.map((cat) => [cat.name.trim(), cat])).values())
+    : [];
 
   const cleanSourceUrl = (article.sourceUrl || '')
     .replace(/https?:\/\/localhost(:\d+)?(\/wordpress)?/gi, 'http://samabima.org');

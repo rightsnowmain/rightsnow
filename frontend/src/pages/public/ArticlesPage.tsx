@@ -20,11 +20,12 @@ export const ArticlesPage: React.FC = () => {
       try {
         setLoading(true);
         const res = await ArticlesService.getArticles({ page, limit: 12, sort: 'newest' });
-        setArticles(res.data);
-        setTotalPages(res.meta.totalPages);
-        setTotalCount(res.meta.total);
+        setArticles(Array.isArray(res?.data) ? res.data : []);
+        setTotalPages(res?.meta?.totalPages || 1);
+        setTotalCount(res?.meta?.total || 0);
       } catch (err) {
         console.error('Error fetching articles:', err);
+        setArticles([]);
       } finally {
         setLoading(false);
       }

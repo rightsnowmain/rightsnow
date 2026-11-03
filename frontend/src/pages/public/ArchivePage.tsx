@@ -75,11 +75,12 @@ export const ArchivePage: React.FC = () => {
           page,
           limit: 12,
         });
-        setArticles(res.data);
-        setTotalCount(res.meta.total);
-        setTotalPages(res.meta.totalPages);
+        setArticles(Array.isArray(res?.data) ? res.data : []);
+        setTotalCount(res?.meta?.total || 0);
+        setTotalPages(res?.meta?.totalPages || 1);
       } catch (err) {
         console.error('Failed to fetch archive articles:', err);
+        setArticles([]);
       } finally {
         setLoading(false);
       }

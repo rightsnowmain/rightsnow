@@ -21,7 +21,7 @@ export const PublisherFilter: React.FC<PublisherFilterProps> = ({
         className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-rose-900 focus:outline-none"
       >
         <option value="">සියලු ප්‍රකාශකයන් (All)</option>
-        {publishers.map((p) => (
+        {(Array.isArray(publishers) ? publishers : []).map((p) => (
           <option key={p.id} value={p.id}>
             {p.name}
           </option>

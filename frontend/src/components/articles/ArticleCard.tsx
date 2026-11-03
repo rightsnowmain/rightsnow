@@ -36,7 +36,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, featured = fa
             }}
           />
           <div className="absolute top-3 left-3 flex gap-2">
-            {article.categories?.slice(0, 2).map((cat) => (
+            {Array.isArray(article.categories) && article.categories.slice(0, 2).map((cat) => (
               <span
                 key={cat.id}
                 className="bg-rose-900/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded"

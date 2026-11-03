@@ -13,9 +13,10 @@ export const AuthorPage: React.FC = () => {
     const fetch = async () => {
       try {
         const data = await PublishersService.getAuthors();
-        setAuthors(data);
+        setAuthors(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error(err);
+        setAuthors([]);
       } finally {
         setLoading(false);
       }
@@ -24,6 +25,8 @@ export const AuthorPage: React.FC = () => {
   }, []);
 
   if (loading) return <LoadingSpinner />;
+
+  const safeAuthors = Array.isArray(authors) ? authors : [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -37,7 +40,7 @@ export const AuthorPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {authors.map((author) => (
+        {safeAuthors.map((author) => (
           <div
             key={author.id}
             className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between"

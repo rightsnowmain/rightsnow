@@ -1,0 +1,33 @@
+{
+  "name": "news-publishing-system",
+  "version": "1.0.0",
+  "description": "Production-grade news publishing website and searchable historical digital archive",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend",
+    "dev:api": "npm run start:dev --workspace=backend",
+    "dev:all": "node dev-all.js",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces",
+    "test": "npm run test --workspaces"
+  },
+  "keywords": [
+    "news-publishing",
+    "digital-archive",
+    "react",
+    "nestjs",
+    "prisma",
+    "postgresql",
+    "tailwind"
+  ],
+  "author": "Antigravity Engineering",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "caniuse-lite": "^1.0.30001819"
+  }
+}

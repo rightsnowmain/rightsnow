@@ -1,0 +1,299 @@
+// Prisma Schema for News Publishing & Digital Archive System
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  AUTHOR
+  READER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+enum ArticleStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SPAM
+}
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  passwordHash String
+  displayName  String
+  role         Role        @default(READER)
+  status       UserStatus  @default(ACTIVE)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  authorProfile Author?
+  comments      Comment[]
+  revisions     Revision[]
+  auditEvents   AuditEvent[]
+
+  @@map("users")
+}
+
+model Publisher {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  website     String?
+  logoUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  newspapers Newspaper[]
+  articles   Article[]
+
+  @@map("publishers")
+}
+
+model Newspaper {
+  id          String   @id @default(uuid())
+  publisherId String
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  logoUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  publisher Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+  articles  Article[]
+
+  @@map("newspapers")
+}
+
+model Author {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  bio       String?  @db.Text
+  avatarUrl String?
+  userId    String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  articles Article[]
+
+  @@map("authors")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  articles ArticleCategory[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles ArticleTag[]
+
+  @@map("tags")
+}
+
+model Article {
+  id                  String        @id @default(uuid())
+  legacyId            Int?
+  legacySource        String?       // e.g. "ahilanr_wrdp3", "ahilanr_rnweb"
+  slug                String        @unique
+  title               String        @db.VarChar(500)
+  excerpt             String?       @db.Text
+  body                String        @db.Text
+  status              ArticleStatus @default(DRAFT)
+  publishedAt         DateTime?     @db.Timestamptz
+  scheduledAt         DateTime?     @db.Timestamptz
+  originalPublishedAt DateTime?     @db.Timestamptz // Historical original publication date
+  featuredImage       String?       @db.VarChar(1000)
+  sourceUrl           String?       @db.VarChar(1000)
+  viewCount           Int           @default(0)
+  
+  authorId            String
+  newspaperId         String?
+  publisherId         String?
+  
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  author      Author            @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  newspaper   Newspaper?        @relation(fields: [newspaperId], references: [id], onDelete: SetNull)
+  publisher   Publisher?        @relation(fields: [publisherId], references: [id], onDelete: SetNull)
+  categories  ArticleCategory[]
+  tags        ArticleTag[]
+  mediaItems  ArticleMedia[]
+  comments    Comment[]
+  revisions   Revision[]
+
+  @@index([status, publishedAt])
+  @@index([originalPublishedAt])
+  @@index([authorId])
+  @@index([newspaperId])
+  @@index([publisherId])
+  @@index([legacySource, legacyId])
+  @@map("articles")
+}
+
+model ArticleCategory {
+  articleId  String
+  categoryId String
+
+  article  Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, categoryId])
+  @@map("article_categories")
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@map("article_tags")
+}
+
+model Media {
+  id         String   @id @default(uuid())
+  storageKey String
+  url        String
+  filename   String
+  mimeType   String
+  sizeBytes  Int
+  altText    String?
+  credit     String?
+  width      Int?
+  height     Int?
+  createdAt  DateTime @default(now())
+
+  articleMedia ArticleMedia[]
+
+  @@map("media")
+}
+
+model ArticleMedia {
+  articleId String
+  mediaId   String
+  sortOrder Int    @default(0)
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  media   Media   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, mediaId])
+  @@map("article_media")
+}
+
+model Comment {
+  id        String        @id @default(uuid())
+  articleId String
+  userId    String
+  parentId  String?
+  body      String        @db.Text
+  status    CommentStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  article Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([articleId, status])
+  @@map("comments")
+}
+
+model Revision {
+  id        String   @id @default(uuid())
+  articleId String
+  editorId  String
+  snapshot  Json
+  createdAt DateTime @default(now())
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  editor  User    @relation(fields: [editorId], references: [id], onDelete: Restrict)
+
+  @@map("revisions")
+}
+
+model AuditEvent {
+  id        String   @id @default(uuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@map("audit_events")
+}
+
+model ImportBatch {
+  id          String   @id @default(uuid())
+  source      String
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  totalRows   Int      @default(0)
+  imported    Int      @default(0)
+  skipped     Int      @default(0)
+  failed      Int      @default(0)
+  status      String   @default("RUNNING") // RUNNING, COMPLETED, FAILED
+
+  records ImportRecord[]
+
+  @@map("import_batches")
+}
+
+model ImportRecord {
+  id        String   @id @default(uuid())
+  batchId   String
+  legacyKey String
+  targetId  String?
+  status    String   // SUCCESS, SKIPPED, ERROR
+  error     String?  @db.Text
+  createdAt DateTime @default(now())
+
+  batch ImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@map("import_records")
+}

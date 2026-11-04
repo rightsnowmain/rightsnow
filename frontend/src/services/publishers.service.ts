@@ -1,5 +1,6 @@
 import api from './api';
 import { Author, Category, Newspaper, Publisher } from '../types';
+import { FALLBACK_ARTICLES } from './articles.service';
 
 const FALLBACK_NEWSPAPERS: Newspaper[] = [
   {
@@ -65,8 +66,10 @@ export const PublishersService = {
       const res = await api.get(`/newspapers/${slug}`);
       if (res.data && typeof res.data === 'object' && res.data.name) return res.data;
     } catch {}
-    const fb = FALLBACK_NEWSPAPERS.find(n => n.slug === slug) || FALLBACK_NEWSPAPERS[0];
-    return { ...fb, articles: [] };
+    const fb = FALLBACK_NEWSPAPERS.find((n) => n.slug === slug) || FALLBACK_NEWSPAPERS[0];
+    const matching = FALLBACK_ARTICLES.filter((a) => a.newspaper?.slug === fb.slug);
+    const articles = matching.length > 0 ? matching : FALLBACK_ARTICLES.slice(0, 3);
+    return { ...fb, articles };
   },
 
   getAuthors: async (): Promise<Author[]> => {
@@ -82,8 +85,10 @@ export const PublishersService = {
       const res = await api.get(`/authors/${slug}`);
       if (res.data && typeof res.data === 'object' && res.data.name) return res.data;
     } catch {}
-    const fb = FALLBACK_AUTHORS.find(a => a.slug === slug) || FALLBACK_AUTHORS[0];
-    return { ...fb, articles: [] };
+    const fb = FALLBACK_AUTHORS.find((a) => a.slug === slug) || FALLBACK_AUTHORS[0];
+    const matching = FALLBACK_ARTICLES.filter((a) => a.author?.slug === fb.slug);
+    const articles = matching.length > 0 ? matching : FALLBACK_ARTICLES.slice(0, 2);
+    return { ...fb, articles };
   },
 
   getCategories: async (): Promise<Category[]> => {

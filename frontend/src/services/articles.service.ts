@@ -1,7 +1,7 @@
 import api from './api';
 import { Article, FilterOptions, PaginatedResponse } from '../types';
 
-const FALLBACK_ARTICLES: Article[] = [
+export const FALLBACK_ARTICLES: Article[] = [
   {
     id: 'art-demo-1',
     slug: 'democraciat-abbehivenna-22822',
@@ -128,6 +128,18 @@ export const ArticlesService = {
     if (filters.q) {
       const q = filters.q.toLowerCase();
       filtered = filtered.filter(a => a.title.toLowerCase().includes(q) || (a.excerpt && a.excerpt.toLowerCase().includes(q)));
+    }
+    if (filters.authorId) {
+      const byAuthor = filtered.filter(a => a.author?.id === filters.authorId);
+      if (byAuthor.length > 0) filtered = byAuthor;
+    }
+    if (filters.categoryId) {
+      const byCat = filtered.filter(a => a.categories?.some(c => c.id === filters.categoryId));
+      if (byCat.length > 0) filtered = byCat;
+    }
+    if (filters.newspaperId) {
+      const byNp = filtered.filter(a => a.newspaper?.id === filters.newspaperId);
+      if (byNp.length > 0) filtered = byNp;
     }
     return {
       data: filtered,

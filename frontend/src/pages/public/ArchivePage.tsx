@@ -103,9 +103,9 @@ export const ArchivePage: React.FC = () => {
     setSearchParams(new URLSearchParams());
   };
 
-  const activeAuthor = filterOptions?.authors.find((a) => a.id === authorId);
-  const activePublisher = filterOptions?.publishers.find((p) => p.id === publisherId);
-  const activeCategory = filterOptions?.categories.find((c) => c.id === categoryId);
+  const activeAuthor = filterOptions?.authors?.find((a) => a.id === authorId);
+  const activePublisher = filterOptions?.publishers?.find((p) => p.id === publisherId);
+  const activeCategory = filterOptions?.categories?.find((c) => c.id === categoryId);
 
   const hasActiveFilters = !!(query || year || from || to || publisherId || authorId || categoryId || sort !== 'newest');
 
